@@ -94,7 +94,7 @@ with st.sidebar:
 
     
 
-    st.divider()
+    
 
     st.markdown("### A thought for today")
 
