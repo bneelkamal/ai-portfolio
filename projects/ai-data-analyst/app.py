@@ -3,10 +3,11 @@ from __future__ import annotations
 from io import BytesIO
 
 import pandas as pd
-import plotly.express as px
 import streamlit as st
+import streamlit_highcharts as hct
 
 from agent_graph import run_agentic_analysis
+from chart_builder import build_dynamic_charts
 from report_recommender import recommend_reports
 from sample_data import get_sample_datasets
 from security import validate_upload
@@ -38,7 +39,6 @@ with st.sidebar:
     source_label = ""
     source_warning = None
     text_preview = None
-
     if source_type == "Upload file":
         uploaded = st.file_uploader("Upload CSV or XLSX", type=["csv", "xlsx"])
         if uploaded is not None:
@@ -53,7 +53,6 @@ with st.sidebar:
                     st.error(f"Could not parse this file: {exc}")
             else:
                 st.error("The file was rejected before analysis.")
-
     elif source_type == "Public URL":
         url = st.text_input("Public URL", placeholder="https://example.com/data.csv")
         if st.button("Fetch and analyze URL", type="primary") and url.strip():
@@ -70,20 +69,17 @@ with st.sidebar:
             source_label = url_result["title"]
             source_warning = url_result.get("warning")
             text_preview = url_result.get("text_preview")
-
     else:
         samples = get_sample_datasets()
         selected_sample = st.selectbox("Choose a sample", list(samples))
         df = samples[selected_sample]
         source_label = f"Sample: {selected_sample}"
         st.success("Trusted synthetic sample selected.")
-
     st.caption("Public URL mode does not bypass logins, paywalls, CAPTCHAs, or anti-bot controls.")
 
 if df is None:
     st.info("Choose a source to begin.")
     st.stop()
-
 if source_warning:
     st.warning(source_warning)
 
@@ -93,78 +89,54 @@ with st.spinner("Running the agentic analysis workflow..."):
 schema = result["schema"]
 recommendations = recommend_reports(schema)
 selected_reports = result["report_plan"]
+chart_groups = build_dynamic_charts(df, schema)
+chart_count = sum(len(charts) for charts in chart_groups.values())
 
 metrics = st.columns(4)
 metrics[0].metric("Rows", f"{len(df):,}")
 metrics[1].metric("Columns", f"{len(df.columns):,}")
-metrics[2].metric("Reports recommended", len(recommendations))
+metrics[2].metric("Charts generated", chart_count)
 metrics[3].metric("Missing cells", f"{int(df.isna().sum().sum()):,}")
 st.caption(f"Source: {source_label}")
 
 st.subheader("Explore the data")
-tab_schema, tab_distributions, tab_relationships, tab_preview = st.tabs(
-    ["Schema", "Distributions", "Relationships", "Preview"]
+tab_schema, tab_distributions, tab_segments, tab_trends, tab_relationships, tab_preview = st.tabs(
+    ["Schema", "Distributions", "Segments", "Trends", "Relationships", "Preview"]
 )
 
 with tab_schema:
     st.dataframe(pd.DataFrame(schema), use_container_width=True, hide_index=True)
 
-with tab_distributions:
-    numeric = [item["column"] for item in schema if item["logical_type"] == "numeric"]
-    if numeric:
-        selected = st.selectbox("Numeric field", numeric)
-        st.plotly_chart(
-            px.histogram(df, x=selected, template="plotly_white", title=f"Distribution of {selected}"),
-            use_container_width=True,
-        )
-    else:
-        st.info("No numeric fields were detected.")
-
-with tab_relationships:
-    numeric = [item["column"] for item in schema if item["logical_type"] == "numeric"]
-    if len(numeric) >= 2:
-        x, y = st.columns(2)
-        x_col = x.selectbox("X field", numeric)
-        y_col = y.selectbox("Y field", numeric, index=1)
-        st.plotly_chart(
-            px.scatter(df, x=x_col, y=y_col, template="plotly_white", title=f"{y_col} vs {x_col}"),
-            use_container_width=True,
-        )
-    else:
-        st.info("At least two numeric fields are needed for a relationship chart.")
+for tab, group_name in ((tab_distributions, "Distributions"), (tab_segments, "Segments"), (tab_trends, "Trends"), (tab_relationships, "Relationships")):
+    with tab:
+        charts = chart_groups[group_name]
+        if not charts:
+            st.info(f"No applicable {group_name.lower()} charts were detected for this dataset.")
+        else:
+            for chart in charts:
+                hct.streamlit_highcharts(chart, 520)
 
 with tab_preview:
     st.dataframe(df.head(100), use_container_width=True, hide_index=True)
 
 st.subheader("Recommended analysis")
 st.caption("Based on the detected fields, data quality, and relationships.")
-recommendation_labels = [
-    "Overview",
-    "Data quality",
-    "Distributions",
-    "Segment comparison",
-    "Time trends",
-    "Relationships",
-]
+recommendation_labels = ["Overview", "Data quality", "Distributions", "Segment comparison", "Time trends", "Relationships"]
 st.write(" · ".join(recommendation_labels))
 
 with st.expander("Why these analyses were selected"):
-    st.markdown(
-        """
-        - **Overview:** establishes dataset size and structure.
-        - **Data quality:** checks missing values and structural issues.
-        - **Distributions:** reviews numeric-field patterns.
-        - **Segment comparison:** compares measures across categories.
-        - **Time trends:** compares measures over time.
-        - **Relationships:** explores correlations between numeric fields.
-        """
-    )
+    st.markdown("""
+    - **Overview:** establishes dataset size and structure.
+    - **Data quality:** checks missing values and structural issues.
+    - **Distributions:** reviews numeric-field patterns.
+    - **Segment comparison:** compares measures across categories.
+    - **Time trends:** compares measures over time.
+    - **Relationships:** explores correlations between numeric fields.
+    """)
 
 with st.expander("Technical details"):
-    st.caption(
-        f"{len(selected_reports)} analysis modules selected · "
-        f"{len(df):,} rows · {len(df.columns)} columns"
-    )
+    st.caption(f"{len(selected_reports)} analysis modules selected · {len(df):,} rows · {len(df.columns)} columns")
+    st.caption(f"{chart_count} dynamic Highcharts visualizations generated.")
     for insight in result["insights"]:
         st.markdown(f"- {insight}")
     for warning in result.get("warnings", []):
@@ -173,4 +145,4 @@ with st.expander("Technical details"):
         st.write(text_preview)
 
 st.divider()
-st.caption("LangGraph orchestration · secure input checks · automatic report recommendations · Streamlit portal")
+st.caption("LangGraph orchestration · secure input checks · dynamic Highcharts visualizations · Streamlit portal")
