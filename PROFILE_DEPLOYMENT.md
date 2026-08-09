@@ -2,13 +2,17 @@
 
 ## Entrypoint
 
-Deploy this root portfolio application through Streamlit Community Cloud:
+Deploy only the root portfolio application through Streamlit Community Cloud:
 
 ```text
 portfolio_app.py
 ```
 
-Use `requirements-profile.txt` as the dependency file if the deployment interface requests one.
+The AI Data Analyst is an internal page of the same Streamlit application:
+
+```text
+pages/01_AI_Data_Analyst.py
+```
 
 ## Deployment steps
 
@@ -17,9 +21,9 @@ Use `requirements-profile.txt` as the dependency file if the deployment interfac
 3. Select the `main` branch.
 4. Set the main file path to `portfolio_app.py`.
 5. Deploy the app.
-6. Copy the deployed URL into the portfolio repository README and project cards.
+6. Use the app navigation to open **Agentic AI Data Analyst**.
 
-This is the AI Portfolio landing page. The AI Data Analyst is one featured project within the portal, not the identity of the landing page.
+The result is one profile URL containing the portfolio home page and project pages. Do not deploy `projects/ai-data-analyst/app.py` as a second Streamlit application.
 
 ## Before publishing
 
@@ -27,7 +31,6 @@ Replace placeholder links in `portfolio_app.py`:
 
 - LinkedIn URL.
 - Contact email.
-- Live Streamlit demo URL for the AI Data Analyst.
-- Future project source and demo URLs.
+- Future external project links.
 
 Do not add API keys or private research data to this public repository.
