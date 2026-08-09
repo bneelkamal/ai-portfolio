@@ -31,8 +31,8 @@ st.markdown("""
 links = st.columns(4)
 links[0].link_button("GitHub", "https://github.com/bneelkamal", use_container_width=True)
 links[1].link_button("AI Portfolio", "https://github.com/bneelkamal/ai-portfolio", use_container_width=True)
-links[2].link_button("LinkedIn", "https://www.linkedin.com/", use_container_width=True)
-links[3].link_button("Contact", "mailto:neelkamal@example.com", use_container_width=True)
+links[2].link_button("LinkedIn", "https://www.linkedin.com/in/bneelkamal/", use_container_width=True)
+links[3].link_button("Contact", "mailto:bneelkamal@outlook.com", use_container_width=True)
 
 st.header("About")
 st.markdown("I am a Product Manager with 14 years of experience and a Master's student in Artificial Intelligence, aspiring to pursue doctoral research at the intersection of AI and business management. My work connects product strategy, stakeholder communication, business-value analysis, AI system design, and responsible deployment.")
