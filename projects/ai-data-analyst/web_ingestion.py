@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__
 
 from io import BytesIO, StringIO
 from ipaddress import ip_address
@@ -61,7 +61,7 @@ def extract_public_url(url: str) -> dict:
         return {"kind": "tabular", "dataframe": direct, "title": url, "warning": None}
 
     soup = BeautifulSoup(response.text, "html.parser")
-    tables = pd.read_html(StringIO(response.text))
+    tables = pd.read_html(StringIO(response.text), flavor="lxml")
     if tables:
         frame = max(tables, key=lambda table: table.shape[0] * table.shape[1]).copy()
         return {
