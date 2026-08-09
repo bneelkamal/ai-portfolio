@@ -1,19 +1,28 @@
 # Agentic AI Data Analyst
 
-An upload-first Streamlit portal that uses a LangGraph workflow to understand a CSV/XLSX dataset, select useful report modules, calculate evidence, and present an initial executive-friendly briefing.
+An upload-first Streamlit analytics portal that accepts CSV/XLSX files or public URLs, extracts usable data, uses a LangGraph workflow to select reports, and presents an executive-friendly briefing.
 
-## Why this is agentic
+## Inputs
 
-The workflow is decomposed into stateful nodes:
+- CSV, XLSX, and XLS files.
+- Direct public CSV, Excel, or JSON URLs.
+- Public HTML pages containing tables.
+- Text-only public pages, represented by page-level metadata when no table is available.
 
-1. Source — accepts the uploaded dataset.
+## Agent workflow
+
+1. Source — accepts a file or extracted URL result.
 2. Schema — infers logical types and data quality metadata.
 3. Planner — selects reports based on detected data patterns.
 4. Analysis — computes deterministic summaries and relationships.
 5. Insight — produces evidence-grounded observations.
 6. Review — checks that the workflow produced a valid result.
 
-The current milestone does not require an LLM API. This makes the public demo reliable and keeps the numerical analysis deterministic. An optional model can later improve planning and narrative generation without replacing the calculation layer.
+The current milestone does not require an LLM API. This makes the public demo reliable and keeps numerical analysis deterministic.
+
+## Responsible URL access
+
+The demo accepts public HTTP(S) URLs only. It uses request timeouts and response-size limits, rejects local/private-network destinations, and does not bypass authentication, paywalls, CAPTCHAs, or anti-bot controls. Users should respect website terms and robots guidance.
 
 ## Run locally
 
@@ -25,14 +34,6 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-## Free and deployment modes
-
-- **No API mode:** LangGraph plus deterministic Python tools. Works locally and on Streamlit hosting without an LLM key.
-- **Local model mode:** Connect an Ollama model during local development. The model stays on the developer machine.
-- **Free hosted model mode:** Optionally connect a provider free tier through Streamlit Secrets. The application must retain the deterministic fallback.
-
-Never commit API keys to GitHub. Public demos should use synthetic or non-sensitive datasets when external model calls are enabled.
-
 ## Links
 
 - [Portfolio repository](https://github.com/bneelkamal/ai-portfolio)
@@ -42,8 +43,9 @@ Never commit API keys to GitHub. Public demos should use synthetic or non-sensit
 
 ## Next milestones
 
-- Add public URL ingestion for HTML tables, CSV/XLSX links, JSON, and text pages.
-- Add a report recommender with explanations for every selected report.
-- Add visualization and reviewer agents as explicit graph nodes.
+- Add report recommendation explanations.
+- Add explicit visualization and reviewer agents.
+- Add workbook sheet selection and multi-table comparison.
 - Add optional grounded summarization through a free-tier model.
-- Add report downloads and evaluation datasets.
+- Add downloadable HTML/PDF reports.
+- Add a Kaggle validation notebook.
