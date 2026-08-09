@@ -119,10 +119,10 @@ with tab_schema:
     st.dataframe(pd.DataFrame(schema), use_container_width=True, hide_index=True)
 
 with tab_distributions:
-    render_chart_grid(chart_groups["Distributions"], columns=3)
+    render_chart_grid(chart_groups["Distributions"], columns=2)
 
 with tab_segments:
-    render_chart_grid(chart_groups["Segments"], columns=3)
+    render_chart_grid(chart_groups["Segments"], columns=2)
 
 with tab_trends:
     render_chart_grid(chart_groups["Trends"], columns=2)
