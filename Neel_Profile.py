@@ -91,18 +91,6 @@ st.markdown(
 
 
 with st.sidebar:
-    st.markdown(
-        """
-        <div style="text-align:center; padding:.6rem 0 1rem;">
-            <div style="font-size:2.5rem;">◈</div>
-            <h2 style="margin:.2rem 0;">Neel's Profile</h2>
-            <p style="color:#64748b; font-size:.9rem;">
-                Research Enthusiast · Lifelong Learner
-            </p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
 
     
 
