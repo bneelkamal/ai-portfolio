@@ -1,4 +1,4 @@
-from __future__
+from __future__ import annotations
 
 from io import BytesIO, StringIO
 from ipaddress import ip_address
