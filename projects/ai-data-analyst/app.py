@@ -86,15 +86,13 @@ if df is None:
 
 if source_warning:
     st.warning(source_warning)
-if text_preview:
-    with st.expander("Extracted page text preview"):
-        st.write(text_preview)
 
 with st.spinner("Running the agentic analysis workflow..."):
     result = run_agentic_analysis(df)
 
 schema = result["schema"]
 recommendations = recommend_reports(schema)
+selected_reports = result["report_plan"]
 
 metrics = st.columns(4)
 metrics[0].metric("Rows", f"{len(df):,}")
@@ -103,39 +101,76 @@ metrics[2].metric("Reports recommended", len(recommendations))
 metrics[3].metric("Missing cells", f"{int(df.isna().sum().sum()):,}")
 st.caption(f"Source: {source_label}")
 
-st.subheader("Recommended reports")
-st.caption("Recommendations are based on the detected data types, relationships, and quality signals.")
-for recommendation in recommendations:
-    st.info(f"**{recommendation['name']}** — {recommendation['reason']}")
+st.subheader("Explore the data")
+tab_schema, tab_distributions, tab_relationships, tab_preview = st.tabs(
+    ["Schema", "Distributions", "Relationships", "Preview"]
+)
 
-st.subheader("Agent-selected workflow")
-st.write(" · ".join(report.replace("_", " ").title() for report in result["report_plan"]))
-for insight in result["insights"]:
-    st.markdown(f"- {insight}")
-for warning in result.get("warnings", []):
-    st.warning(warning)
-
-tabs = st.tabs(["Schema", "Distributions", "Relationships", "Preview"])
-with tabs[0]:
+with tab_schema:
     st.dataframe(pd.DataFrame(schema), use_container_width=True, hide_index=True)
-with tabs[1]:
+
+with tab_distributions:
     numeric = [item["column"] for item in schema if item["logical_type"] == "numeric"]
     if numeric:
         selected = st.selectbox("Numeric field", numeric)
-        st.plotly_chart(px.histogram(df, x=selected, template="plotly_white", title=f"Distribution of {selected}"), use_container_width=True)
+        st.plotly_chart(
+            px.histogram(df, x=selected, template="plotly_white", title=f"Distribution of {selected}"),
+            use_container_width=True,
+        )
     else:
         st.info("No numeric fields were detected.")
-with tabs[2]:
+
+with tab_relationships:
     numeric = [item["column"] for item in schema if item["logical_type"] == "numeric"]
     if len(numeric) >= 2:
         x, y = st.columns(2)
         x_col = x.selectbox("X field", numeric)
         y_col = y.selectbox("Y field", numeric, index=1)
-        st.plotly_chart(px.scatter(df, x=x_col, y=y_col, template="plotly_white", title=f"{y_col} vs {x_col}"), use_container_width=True)
+        st.plotly_chart(
+            px.scatter(df, x=x_col, y=y_col, template="plotly_white", title=f"{y_col} vs {x_col}"),
+            use_container_width=True,
+        )
     else:
         st.info("At least two numeric fields are needed for a relationship chart.")
-with tabs[3]:
+
+with tab_preview:
     st.dataframe(df.head(100), use_container_width=True, hide_index=True)
+
+st.subheader("Recommended analysis")
+st.caption("Based on the detected fields, data quality, and relationships.")
+recommendation_labels = [
+    "Overview",
+    "Data quality",
+    "Distributions",
+    "Segment comparison",
+    "Time trends",
+    "Relationships",
+]
+st.write(" · ".join(recommendation_labels))
+
+with st.expander("Why these analyses were selected"):
+    st.markdown(
+        """
+        - **Overview:** establishes dataset size and structure.
+        - **Data quality:** checks missing values and structural issues.
+        - **Distributions:** reviews numeric-field patterns.
+        - **Segment comparison:** compares measures across categories.
+        - **Time trends:** compares measures over time.
+        - **Relationships:** explores correlations between numeric fields.
+        """
+    )
+
+with st.expander("Technical details"):
+    st.caption(
+        f"{len(selected_reports)} analysis modules selected · "
+        f"{len(df):,} rows · {len(df.columns)} columns"
+    )
+    for insight in result["insights"]:
+        st.markdown(f"- {insight}")
+    for warning in result.get("warnings", []):
+        st.warning(warning)
+    if text_preview:
+        st.write(text_preview)
 
 st.divider()
 st.caption("LangGraph orchestration · secure input checks · automatic report recommendations · Streamlit portal")
