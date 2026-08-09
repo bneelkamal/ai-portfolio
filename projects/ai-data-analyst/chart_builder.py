@@ -19,8 +19,43 @@ def _base(title: str, subtitle: str | None = None) -> dict[str, Any]:
         "title": {"text": title, "style": {"color": "#111827", "fontWeight": "600"}},
         "credits": {"enabled": False},
         "legend": {"itemStyle": {"color": "#374151"}},
-        "xAxis": {"labels": {"style": {"color": "#4B5563"}}, "gridLineColor": "#E5E7EB"},
-        "yAxis": {"labels": {"style": {"color": "#4B5563"}}, "gridLineColor": "#E5E7EB"},
+        "xAxis": {
+            "labels": {
+                "style": {
+                    "color": "#000000",
+                    "fontSize": "12px",
+                    "fontWeight": "500",
+                }
+            },
+            "title": {
+                "style": {
+                    "color": "#000000",
+                    "fontWeight": "600",
+                }
+            },
+            "lineColor": "#000000",
+            "tickColor": "#000000",
+            "gridLineColor": "#E5E7EB",
+        },
+        "yAxis": {
+            "labels": {
+                "style": {
+                    "color": "#000000",
+                    "fontSize": "12px",
+                    "fontWeight": "500",
+                }
+            },
+            "title": {
+                "style": {
+                    "color": "#000000",
+                    "fontWeight": "600",
+                }
+            },
+            "lineColor": "#000000",
+            "tickColor": "#000000",
+            "gridLineColor": "#E5E7EB",
+        },
+
         "tooltip": {"shared": True, "backgroundColor": "#FFFFFF", "borderColor": "#D1D5DB", "style": {"color": "#111827"}},
     }
     if subtitle:
