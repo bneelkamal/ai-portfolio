@@ -6,35 +6,45 @@ import pandas as pd
 
 def get_sample_datasets() -> dict[str, pd.DataFrame]:
     rng = np.random.default_rng(42)
-    dates = pd.date_range("2025-01-01", periods=120, freq="D")
+    n = 240
+    dates = pd.date_range("2024-01-01", periods=n, freq="D")
+    regions = rng.choice(["North", "South", "East", "West"], n)
+    segments = rng.choice(["Retail", "SME", "Corporate"], n, p=[0.55, 0.3, 0.15])
+    banking = pd.DataFrame({
+        "application_date": dates,
+        "region": regions,
+        "customer_segment": segments,
+        "loan_amount": rng.lognormal(11.0, 0.55, n).round(2),
+        "annual_income": rng.lognormal(12.0, 0.45, n).round(2),
+        "credit_score": np.clip(rng.normal(700, 55, n), 420, 850).round(),
+        "default_flag": rng.binomial(1, 0.12, n),
+    })
+    claims = pd.DataFrame({
+        "claim_date": dates,
+        "product": rng.choice(["Motor", "Health", "Property", "Travel"], n),
+        "channel": rng.choice(["Agent", "Web", "Branch"], n),
+        "claim_amount": rng.gamma(2.2, 18000, n).round(2),
+        "processing_days": np.maximum(rng.normal(11, 5, n), 1).round(1),
+        "fraud_flag": rng.binomial(1, 0.08, n),
+    })
     sales = pd.DataFrame({
-        "date": dates,
-        "region": rng.choice(["North", "South", "East", "West"], len(dates)),
-        "product": rng.choice(["Platform", "Analytics", "Security"], len(dates)),
-        "units_sold": rng.poisson(45, len(dates)) + 5,
-        "discount": rng.uniform(0.02, 0.22, len(dates)).round(2),
-        "channel": rng.choice(["Direct", "Partner", "Online"], len(dates)),
+        "order_date": dates,
+        "category": rng.choice(["Electronics", "Home", "Fashion", "Grocery"], n),
+        "region": regions,
+        "units": rng.integers(1, 15, n),
+        "revenue": rng.lognormal(7.4, 0.7, n).round(2),
+        "discount_pct": rng.uniform(0, 35, n).round(1),
     })
-    sales["revenue"] = (sales["units_sold"] * rng.normal(185, 20, len(dates)) * (1 - sales["discount"])).round(2)
-
-    n = 250
-    churn = pd.DataFrame({
-        "customer_id": [f"C{i:04d}" for i in range(n)],
-        "signup_date": pd.Timestamp("2024-01-01") + pd.to_timedelta(rng.integers(0, 600, n), unit="D"),
-        "plan": rng.choice(["Basic", "Professional", "Enterprise"], n, p=[.45, .4, .15]),
-        "monthly_fee": rng.choice([29, 79, 199], n, p=[.45, .4, .15]),
-        "tenure_months": rng.integers(1, 48, n),
-        "country": rng.choice(["India", "UK", "Germany", "USA"], n),
+    trend_dates = pd.date_range("2022-01-01", periods=36, freq="MS")
+    trend = pd.DataFrame({
+        "month": trend_dates,
+        "revenue": (100000 + np.arange(36) * 4200 + rng.normal(0, 9000, 36)).round(2),
+        "expenses": (65000 + np.arange(36) * 2500 + rng.normal(0, 6500, 36)).round(2),
+        "customers": (1200 + np.arange(36) * 35 + rng.normal(0, 45, 36)).round().astype(int),
     })
-    churn["churned"] = (((churn["tenure_months"] < 8) & (rng.random(n) < .45)) | (rng.random(n) < .12)).astype(int)
-
-    n = 500
-    fraud = pd.DataFrame({
-        "transaction_id": [f"T{i:05d}" for i in range(n)],
-        "timestamp": pd.Timestamp("2025-03-01") + pd.to_timedelta(rng.integers(0, 30 * 24 * 60, n), unit="m"),
-        "amount": rng.lognormal(4, 1, n).round(2),
-        "merchant_category": rng.choice(["Retail", "Travel", "Food", "Digital", "Gambling"], n),
-        "country": rng.choice(["IN", "GB", "DE", "US"], n),
-    })
-    fraud["is_fraud"] = (fraud["amount"] > fraud["amount"].quantile(.96)).astype(int)
-    return {"Sales performance": sales, "Customer churn": churn, "Fraud transactions": fraud}
+    return {
+        "Banking risk portfolio": banking,
+        "Insurance claims": claims,
+        "Retail sales": sales,
+        "Monthly business trend": trend,
+    }
