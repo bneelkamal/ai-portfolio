@@ -281,7 +281,7 @@ st.markdown(
     """
 <div class="hero">
   <div class="eyebrow">
-    AI Portfolio · Product Management · Responsible Innovation
+    AI Portfolio · Product Management · Responsible Innovation · BFSI · Research Enthusiast · Lifelong Learner
   </div>
   <h1>Neelkamal Badana</h1>
   <p>
@@ -321,7 +321,7 @@ links[2].link_button(
 
 links[3].link_button(
     "Contact",
-    "mailto:bneelkamal@outlook.com",
+    "https://www.linkedin.com/in/bneelkamal/",
     use_container_width=True,
 )
 
@@ -330,7 +330,7 @@ st.header("About")
 
 st.markdown(
     """
-I am a Product Manager with 14 years of experience and a Master's student
+I am a Product Manager with 14 years of experience in BFSI with an MBA in Finance & Project Management and a Master's student
 in Artificial Intelligence, aspiring to pursue doctoral research at the
 intersection of AI and business management. My work connects product strategy,
 stakeholder communication, business-value analysis, AI system design, and
