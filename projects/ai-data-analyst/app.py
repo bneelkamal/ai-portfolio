@@ -32,6 +32,18 @@ def show_security(report: dict) -> None:
             st.warning(warning)
 
 
+def render_chart_grid(charts: list[dict], columns: int) -> None:
+    if not charts:
+        st.info("No applicable charts were detected for this dataset.")
+        return
+    for start in range(0, len(charts), columns):
+        row = charts[start:start + columns]
+        chart_columns = st.columns(columns)
+        for position, chart in enumerate(row):
+            with chart_columns[position]:
+                hct.streamlit_highcharts(chart, 360)
+
+
 with st.sidebar:
     st.header("Data source")
     source_type = st.radio("Choose input", ["Upload file", "Public URL", "Sample dataset"])
@@ -87,7 +99,6 @@ with st.spinner("Running the agentic analysis workflow..."):
     result = run_agentic_analysis(df)
 
 schema = result["schema"]
-recommendations = recommend_reports(schema)
 selected_reports = result["report_plan"]
 chart_groups = build_dynamic_charts(df, schema)
 chart_count = sum(len(charts) for charts in chart_groups.values())
@@ -107,14 +118,17 @@ tab_schema, tab_distributions, tab_segments, tab_trends, tab_relationships, tab_
 with tab_schema:
     st.dataframe(pd.DataFrame(schema), use_container_width=True, hide_index=True)
 
-for tab, group_name in ((tab_distributions, "Distributions"), (tab_segments, "Segments"), (tab_trends, "Trends"), (tab_relationships, "Relationships")):
-    with tab:
-        charts = chart_groups[group_name]
-        if not charts:
-            st.info(f"No applicable {group_name.lower()} charts were detected for this dataset.")
-        else:
-            for chart in charts:
-                hct.streamlit_highcharts(chart, 520)
+with tab_distributions:
+    render_chart_grid(chart_groups["Distributions"], columns=3)
+
+with tab_segments:
+    render_chart_grid(chart_groups["Segments"], columns=3)
+
+with tab_trends:
+    render_chart_grid(chart_groups["Trends"], columns=2)
+
+with tab_relationships:
+    render_chart_grid(chart_groups["Relationships"], columns=2)
 
 with tab_preview:
     st.dataframe(df.head(100), use_container_width=True, hide_index=True)
