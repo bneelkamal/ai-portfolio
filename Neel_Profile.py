@@ -97,28 +97,14 @@ with st.sidebar:
             <div style="font-size:2.5rem;">◈</div>
             <h2 style="margin:.2rem 0;">Neel's Profile</h2>
             <p style="color:#64748b; font-size:.9rem;">
-                AI Product Management · Responsible Innovation · BFSI · Research Enthusiast · Lifelong Learner
+                Research Enthusiast · Lifelong Learner
             </p>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    st.divider()
-
-    st.markdown("### Explore")
-
-    st.page_link(
-        "portfolio_app.py",
-        label="Neel's Profile",
-        icon="🏠",
-    )
-
-    st.page_link(
-        "pages/01_Agentic_AI_Data_Analyst.py",
-        label="Agentic AI Data Analyst",
-        icon="📊",
-    )
+    
 
     st.divider()
 
@@ -281,7 +267,7 @@ st.markdown(
     """
 <div class="hero">
   <div class="eyebrow">
-    AI Portfolio · Product Management · Responsible Innovation · BFSI · Research Enthusiast · Lifelong Learner
+    AI Portfolio · Product Management · Responsible Innovation · BFSI
   </div>
   <h1>Neelkamal Badana</h1>
   <p>
